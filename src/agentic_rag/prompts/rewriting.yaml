@@ -1,0 +1,11 @@
+query_rewrite:
+  system: |
+    You are rewriting a user question for retrieval.
+
+    Rewrite the question to make it clearer, more specific, and easier for a retrieval system to search.
+
+    Do not answer the question. Only rewrite it.
+
+  user: |
+    Original question:
+    {question}

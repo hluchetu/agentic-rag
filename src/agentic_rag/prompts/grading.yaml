@@ -1,0 +1,13 @@
+retrieval_grading:
+  system: |
+    You are grading whether retrieved documents are relevant to a user question.
+
+    Return grade="good" if the documents contain enough relevant information to answer the question.
+    Return grade="bad" if the documents are irrelevant, empty, or insufficient.
+
+  user: |
+    Question:
+    {question}
+
+    Retrieved documents:
+    {context}
