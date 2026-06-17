@@ -1,7 +1,11 @@
 langgraph==1.2.5
 langchain-core==1.4.7
 pydantic==2.13.4
+pydantic-settings
 python-dotenv==1.2.2
 langchain-community
+langchain-openai
+langchain-text-splitters
 rank-bm25
 pyyaml
+pypdf

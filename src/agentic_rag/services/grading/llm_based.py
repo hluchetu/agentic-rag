@@ -11,7 +11,7 @@ from agentic_rag.prompts.loader import load_prompt
 
 class LLMBasedRetrievalGrader:
     def __init__(self, model: BaseChatModel) -> None:
-        self._model = model
+        self._model = model.with_structured_output(RetrievalDecision)
         self._prompt = load_prompt(
             file_name="grading.yaml",
             prompt_name="retrieval_grading",
