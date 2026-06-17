@@ -6,10 +6,21 @@ from pydantic import BaseModel, Field
 
 
 RetrievalGrade = Literal["good", "bad"]
+QueryRoute = Literal["standard", "multi_query"]
 
 
 class RetrievalDecision(BaseModel):
     grade: RetrievalGrade
+    reason: str
+
+
+class GeneratedAnswer(BaseModel):
+    answer: str
+    citations: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class QueryClassification(BaseModel):
+    route: QueryRoute
     reason: str
 
 
@@ -18,6 +29,6 @@ class QueryRewrite(BaseModel):
     reason: str
 
 
-class GeneratedAnswer(BaseModel):
-    answer: str
-    citations: list[dict[str, Any]] = Field(default_factory=list)
+class MultiQueryRewrite(BaseModel):
+    queries: list[str]
+    reason: str

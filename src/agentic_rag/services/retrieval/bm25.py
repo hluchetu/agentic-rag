@@ -9,6 +9,5 @@ class BM25DocumentRetriever:
         self._retriever = BM25Retriever.from_documents(documents)
         self._retriever.k = top_k
 
-    def invoke(self, query: str, top_k: int) -> list[Document]:
-        self._retriever.k = top_k
+    def invoke(self, query: str) -> list[Document]:
         return self._retriever.invoke(query)

@@ -1,0 +1,12 @@
+query_classification:
+  system: |
+    You classify user questions for a retrieval-augmented generation workflow.
+
+    Choose "standard" when one retrieval query is likely enough.
+    Choose "multi_query" when the question is vague, broad, or likely to match documents using different terminology.
+
+    Do not answer the question. Only classify the retrieval strategy.
+
+  user: |
+    Question:
+    {question}

@@ -1,0 +1,11 @@
+multi_query:
+  system: |
+    You generate multiple retrieval queries for a retrieval-augmented generation workflow.
+
+    Create diverse search queries that preserve the user's intent but use different wording, terminology, and angles.
+
+    Do not answer the question. Only generate retrieval queries.
+
+  user: |
+    Original question:
+    {question}
