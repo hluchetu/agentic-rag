@@ -28,26 +28,47 @@ LangGraph provides the graph runtime:
 - Conditional edges route between generation, retry, rewrite, clarification, and fallback paths
 - Services encapsulate retrievers, graders, rewriters, generators, and web search clients
 
-## Planned Package Structure
+## Package Structure
 
 ```text
 src/agentic_rag/
 ├── __init__.py
 ├── state.py
+├── errors.py
 ├── graph.py
-├── nodes.py
 ├── domain/
 │   ├── __init__.py
 │   └── models.py
+├── nodes/
+│   ├── classify_query.py
+│   ├── grade.py
+│   ├── retrieve.py
+│   └── rewrite.py
+├── routing/
+│   ├── query.py
+│   └── retrieval.py
+├── prompts/
+│   ├── query_classification.yaml
+│   ├── multi_query.yaml
+│   └── rewriting.yaml
 ├── services/
-│   ├── __init__.py
-│   ├── retrieval.py
-│   ├── grading.py
-│   ├── rewriting.py
-│   ├── generation.py
-│   └── search.py
+│   ├── retrieval/
+│   │   ├── interface.py
+│   │   └── bm25.py
+│   ├── grading/
+│   │   └── interface.py
+│   ├── classifier/
+│   │   └── query/
+│   │       ├── interface.py
+│   │       └── llm_based.py
+│   ├── transformation/
+│   │   └── query/
+│   │       ├── interface.py
+│   │       ├── rewrite.py
+│   │       └── multi_query.py
+│   └── generation/
+│       └── interface.py
 └── guardrails/
-    ├── __init__.py
     ├── injection.py
     ├── pii.py
     └── access_control.py
