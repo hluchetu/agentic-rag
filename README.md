@@ -1,148 +1,112 @@
 # Agentic RAG
 
-Production-oriented agentic Retrieval-Augmented Generation workflows built with LangGraph.
+Production-oriented Retrieval-Augmented Generation workflow built with LangGraph, LangChain, typed state, query routing, corrective retrieval, and DeepSeek-backed generation.
 
-The system focuses on retrieval control, correction, routing, and fallback behavior for cases where a fixed one-pass RAG pipeline is not enough.
+The project models RAG as a graph instead of a fixed one-pass pipeline. It can classify a query, choose standard or multi-query retrieval, grade retrieved evidence, rewrite weak queries, retrieve again, and generate a grounded answer from the final context.
 
-## Objectives
+## What It Does
 
-- Implement Corrective RAG (CRAG)
-- Implement Adaptive RAG query routing
-- Implement multi-hop retrieval and synthesis
-- Add web search fallback for failed local retrieval
-- Add guardrails for prompt injection, PII handling, and access control
-- Keep graph orchestration separate from retrieval, grading, rewriting, generation, and search services
+- Loads PDF or web sources with LangChain loaders
+- Chunks documents with a recursive text splitter
+- Retrieves evidence with BM25
+- Classifies queries into standard or multi-query retrieval
+- Generates multiple retrieval queries when useful
+- Grades retrieved documents before generation
+- Rewrites weak queries and retries retrieval
+- Generates structured answers with citations
+- Uses Pydantic Settings for environment configuration
+- Keeps graph orchestration separate from retrieval, grading, transformation, and generation services
 
-## Core Architecture
-
-Agentic RAG is modeled as a stateful graph:
+## Architecture
 
 ```text
-state -> node -> state update -> router -> next node
+source
+  -> load documents
+  -> chunk documents
+  -> build retriever
+  -> classify query
+  -> standard retrieval OR multi-query retrieval
+  -> grade retrieval
+  -> generate answer OR rewrite query and retrieve again
 ```
 
-LangGraph provides the graph runtime:
-
-- State carries the question, retrieved chunks, decisions, rewritten queries, and final answer
-- Nodes perform bounded units of work
-- Conditional edges route between generation, retry, rewrite, clarification, and fallback paths
-- Services encapsulate retrievers, graders, rewriters, generators, and web search clients
-
-## Package Structure
+Core package layout:
 
 ```text
 src/agentic_rag/
-├── __init__.py
-├── state.py
-├── errors.py
+├── cli.py
 ├── graph.py
-├── domain/
-│   ├── __init__.py
-│   └── models.py
+├── settings.py
+├── state.py
+├── ingestion/
 ├── nodes/
-│   ├── classify_query.py
-│   ├── grade.py
-│   ├── retrieve.py
-│   └── rewrite.py
-├── routing/
-│   ├── query.py
-│   └── retrieval.py
 ├── prompts/
-│   ├── query_classification.yaml
-│   ├── multi_query.yaml
-│   └── rewriting.yaml
-├── services/
-│   ├── retrieval/
-│   │   ├── interface.py
-│   │   └── bm25.py
-│   ├── grading/
-│   │   └── interface.py
-│   ├── classifier/
-│   │   └── query/
-│   │       ├── interface.py
-│   │       └── llm_based.py
-│   ├── transformation/
-│   │   └── query/
-│   │       ├── interface.py
-│   │       ├── rewrite.py
-│   │       └── multi_query.py
-│   └── generation/
-│       └── interface.py
-└── guardrails/
-    ├── injection.py
-    ├── pii.py
-    └── access_control.py
+├── routing/
+└── services/
 ```
 
-## Corrective RAG
+More detail:
 
-CRAG adds retrieval quality control before generation.
+- [Architecture Notes](docs/architecture.md)
+- [Retrieval Strategy Notes](docs/retrieval-strategies.md)
+- [Recruiter Notes](docs/recruiter-notes.md)
 
-```text
-question
--> retrieve local context
--> grade retrieved context
--> if context is sufficient: generate
--> if context is weak: rewrite query
--> retrieve again
--> if still weak: use web search fallback
--> generate grounded answer
-```
-
-## Adaptive RAG
-
-Adaptive RAG routes the query before retrieval.
-
-```text
-question
--> classify query
--> simple: answer directly
--> retrieval-needed: run CRAG
--> ambiguous: ask for clarification
--> external/current: use web search
-```
-
-## Multi-Hop RAG
-
-Multi-hop RAG handles questions that require chained evidence.
-
-```text
-question
--> decompose into sub-questions
--> retrieve evidence for each sub-question
--> produce partial answers
--> synthesize final answer
-```
-
-## Engineering Principles
-
-- Graph state is typed and explicit
-- Nodes are small functions with clear state updates
-- Services own external behavior and implementation details
-- Graphs depend on interfaces, not concrete providers
-- Retrieval quality is graded before answer generation
-- Fallback paths are explicit and observable
-- Local retrieval, web search, and generation remain independently testable
-
-## Installation
+## Setup
 
 ```bash
 uv pip install -r requirements.txt
 ```
 
-## Run
+Create a `.env` file:
 
-```bash
-python -m agentic_rag
+```text
+DEEPSEEK_API_KEY=your-key
+DEEPSEEK_MODEL=deepseek-v4-flash
 ```
 
-## Roadmap
+`.env` is ignored by git.
 
-1. Define typed domain models and graph state
-2. Implement CRAG graph
-3. Add retrieval grading and query rewriting services
-4. Add web search fallback
-5. Add adaptive routing
-6. Add multi-hop retrieval
-7. Add guardrails
-8. Add evaluation and tracing
+## Run
+
+PDF source:
+
+```bash
+PYTHONPATH=src python -m agentic_rag.cli \
+  --source /path/to/file.pdf \
+  --source-type pdf \
+  --question "What is this document about?"
+```
+
+Web source:
+
+```bash
+PYTHONPATH=src python -m agentic_rag.cli \
+  --source "https://example.com/article" \
+  --source-type web \
+  --question "What are the key ideas?"
+```
+
+## Current Scope
+
+Implemented:
+
+- LangGraph workflow
+- DeepSeek model configuration through Pydantic Settings
+- PDF and web ingestion
+- Recursive document chunking
+- BM25 retrieval
+- Query classification
+- Multi-query retrieval path
+- Retrieval grading
+- Corrective query rewriting
+- Grounded answer generation
+
+Not in scope yet:
+
+- Vector database persistence
+- Backend-native hybrid search
+- Web search fallback
+- HyDE
+- Question decomposition
+- Guardrails
+- Offline evaluation suite
