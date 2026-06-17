@@ -1,4 +1,4 @@
-# Recruiter Notes
+# Project Overview
 
 This project demonstrates practical AI engineering work around RAG, LangGraph, and production-style code organization.
 

@@ -49,7 +49,7 @@ More detail:
 
 - [Architecture Notes](docs/architecture.md)
 - [Retrieval Strategy Notes](docs/retrieval-strategies.md)
-- [Recruiter Notes](docs/recruiter-notes.md)
+- [Project Overview](docs/project-overview.md)
 
 ## Setup
 
